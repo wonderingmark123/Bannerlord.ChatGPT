@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+	<tags>
+		<tag language="简体中文" />
+	</tags>
+	<strings>
+		<string id="t4szG41Y1s" text="你好!能随便聊一会么？ (ChatGPT)" />
+		<string id="CHCUOZxcnR" text="点击此处退出" />
+		<string id="c40K7kO5Yr" text="ChatGPT未成功启动" />
+		<string id="xO4QZbQ7XE" text="APIkey 密钥读取失败，请检查你的 /Modules/Bannerlord_ChatGPT/APIkey.txt" />
+	</strings>
+</base>

@@ -1,0 +1,41 @@
+<Prefab>
+  <Constants>
+
+  
+  </Constants>
+  <Window>
+    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" DoNotAcceptEvents="true">
+      <Children>
+
+        <!-- <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="55" MarginTop="15" Sprite="General\CharacterCreation\name_input_area">
+          <Children>
+            <EditableTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="ClanNaming.NameInput.Text" Text="@ConversationText" GamepadNavigationIndex="0" />
+            
+          </Children>
+        </Widget> -->
+
+
+        <NavigationScopeTargeter ScopeID="UserTextScope" ScopeParent="..\AnswerListContainer" ScopeMovements="Vertical" NavigateFromScopeEdges="true" ExtendDiscoveryAreaLeft="1" />
+        <Widget Id="AnswerListContainer" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="1080" MarginTop="650">
+          <Children>
+            <BrushWidget UpdateChildrenStates="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="70" MarginRight="20" Brush="SaveLoad.Search.Button" IsVisible="@IsChating">
+              <Children>
+                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="55" PositionXOffset="-100" Text="You say:" Brush="Conversation.HeaderText" Brush.FontSize="27" Brush.TextHorizontalAlignment="Left" />
+                <EditableTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"  SuggestedHeight="10" MarginLeft="10" MarginRight="10" Brush="SaveLoad.Search.InputText" Text="@UserText" />
+
+                <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="55" SuggestedWidth="600" PositionYOffset="70" PositionXOffset="-750" Text="@AIText" Brush="Conversation.ConversedPartyLine.Text" Brush.FontSize="@FontsizeAIresponse" Brush.TextHorizontalAlignment="Left" Brush.TextVerticalAlignment = "Top" />
+              </Children>
+            </BrushWidget>
+          </Children>
+        </Widget>
+
+        <!-- <Widget Id="RightPanel" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="694" SuggestedHeight="1080" HorizontalAlignment="Right"  VerticalAlignment="Center" DoNotUseCustomScaleAndChildren="true">
+          <Children>
+            <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="670" SuggestedHeight="55" HorizontalAlignment="Right" Brush="Stage.Title.Text" Text="@Title" />
+          </Children>
+        </Widget> -->
+
+      </Children>
+    </Widget>
+  </Window>
+</Prefab>

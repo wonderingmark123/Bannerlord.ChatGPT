@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+	<tags>
+		<tag language="English" />
+	</tags>
+	<strings>
+		<string id="t4szG41Y1s" text="Hi! I want to talk with you. (ChatGPT)" />
+		<string id="CHCUOZxcnR" text="Click here to exit" />
+		<string id="c40K7kO5Yr" text="ChatGPT didn't start successfully!" />
+		<string id="xO4QZbQ7XE" text="API key is not properly read! Please Check your /Modules/Bannerlord_ChatGPT/APIkey.txt" />
+	</strings>
+</base>

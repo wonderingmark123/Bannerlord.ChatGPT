@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bannerlord.ChatGPT", "Bannerlord.ChatGPT.csproj", "{A9FF6862-D949-4EC6-B792-AACD4301F019}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9FF6862-D949-4EC6-B792-AACD4301F019}.Debug|x64.ActiveCfg = Debug|x64
+		{A9FF6862-D949-4EC6-B792-AACD4301F019}.Debug|x64.Build.0 = Debug|x64
+		{A9FF6862-D949-4EC6-B792-AACD4301F019}.Release|x64.ActiveCfg = Release|x64
+		{A9FF6862-D949-4EC6-B792-AACD4301F019}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CDA26376-FF45-42A9-9586-5811440E6C3D}
+	EndGlobalSection
+EndGlobal
