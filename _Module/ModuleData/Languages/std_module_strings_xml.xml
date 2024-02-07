@@ -8,5 +8,7 @@
 		<string id="CHCUOZxcnR" text="Click here to exit" />
 		<string id="c40K7kO5Yr" text="ChatGPT didn't start successfully!" />
 		<string id="xO4QZbQ7XE" text="API key is not properly read! Please Check your /Modules/Bannerlord_ChatGPT/APIkey.txt" />
+		<string id="0YlmsVWdKl" text="Left click to move to next page. Right click to move to previous page" />
+		<string id="s9eLLK10jE" text="Waiting for response" />
 	</strings>
 </base>

@@ -8,5 +8,7 @@
 		<string id="CHCUOZxcnR" text="点击此处退出" />
 		<string id="c40K7kO5Yr" text="ChatGPT未成功启动" />
 		<string id="xO4QZbQ7XE" text="APIkey 密钥读取失败，请检查你的 /Modules/Bannerlord_ChatGPT/APIkey.txt" />
+		<string id="0YlmsVWdKl" text="左击进入下一页，右击返回上一页" />
+		<string id="s9eLLK10jE" text="等待服务器响应中..." />
 	</strings>
 </base>

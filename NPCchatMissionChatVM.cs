@@ -8,8 +8,6 @@ using TaleWorlds.Library;
 using TaleWorlds.CampaignSystem.LogEntries;
 using System.Threading.Tasks;
 using OpenAI_API;
-using Newtonsoft.Json.Linq;
-using TaleWorlds.GauntletUI;
 using OpenAI_API.Models;
 using TaleWorlds.Localization;
 
@@ -23,15 +21,16 @@ namespace Bannerlord.ChatGPT
         public string response;
         public OpenAIAPI bot;
         public OpenAI_API.Chat.Conversation _chat;
-        string conversationCharacterId;
         private bool _isChating;
         public bool _isBotStarted;
         public bool isResponding;
         private String _APIkey;
         LoggingSystem _logSys;
-
-        
+        private string _currentResponse;
+        private int _currentResponsePage;
         private int _fontsizeAIresponse;
+        private int _chatBoxLength = 250;
+        private int _totalPage;
 
         public NPCchatMissionChatVM(Func<string> getContinueInputText, bool isLinksDisabled = false): base(getContinueInputText, isLinksDisabled)
         {
@@ -84,7 +83,6 @@ namespace Bannerlord.ChatGPT
 
                 try
                 {
-                    
                     PromotsEngine promotsEngine = new PromotsEngine(_conversationManager);  
                     bot = new OpenAIAPI(_APIkey); // shorthand
 
@@ -124,16 +122,35 @@ namespace Bannerlord.ChatGPT
                 
                 return;
             }
+            FontsizeAIresponse = 27;
+            isResponding = true;
+            
             try
             {
-                FontsizeAIresponse = 27;
-                isResponding = true;
                 _chat.AppendUserInput(UserText);
-                AIText = await _chat.GetResponseFromChatbotAsync();
-                if (AIText.Length > 250 && AIText!=null)
+                UserText = new TextObject("{=s9eLLK10jE}Waiting for response").ToString();
+                _currentResponse = await _chat.GetResponseFromChatbotAsync();
+                _currentResponse = _currentResponse.Replace("/n/n", "/n");
+                if (_currentResponse == null) { return; }
+
+                _currentResponsePage = 1;
+                _totalPage = (int)(Math.Ceiling(((double)_currentResponse.Length / (double)_chatBoxLength)));
+
+                if (_currentResponse.Length > _chatBoxLength && _currentResponse != null)
                 {
-                    FontsizeAIresponse = (int)((double)(27 * 250 / AIText.Length));
+                    // FontsizeAIresponse = (int)((double)(27 * 250 / AIText.Length));
+
+                    AIText = _currentResponse.Substring((_currentResponsePage - 1) * _chatBoxLength, _chatBoxLength * _currentResponsePage);
+                    InformationManager.DisplayMessage(new InformationMessage(
+                               new TextObject("{=0YlmsVWdKl}Left click to move to next page. Right click to move to previous page").ToString()));
                 }
+                else
+                {
+                    AIText = _currentResponse;
+
+                }
+
+
             }
             catch (Exception e)
             {
@@ -157,6 +174,38 @@ namespace Bannerlord.ChatGPT
         {
             Debug.Print("ExecuteContinue", 0, Debug.DebugColor.White, 17592186044416UL);
             this._conversationManager.ContinueConversation();
+        }
+
+        internal void PreviousPage()
+        {
+            if(_currentResponsePage <2)
+            {
+                return;
+            }
+            else
+            {
+                _currentResponsePage = _currentResponsePage - 1;
+                AIText = _currentResponse.Substring((_currentResponsePage - 1) * _chatBoxLength, _chatBoxLength);
+            }
+
+        }
+
+        internal void NextPage()
+        {
+            
+            
+            if (_currentResponsePage + 1 > _totalPage)
+            {
+                return;
+            }
+            else
+            {
+                _currentResponsePage = _currentResponsePage + 1;
+                if (_currentResponsePage + 1 > _totalPage)
+                { AIText = _currentResponse.Substring((_currentResponsePage - 1) * _chatBoxLength); }
+                else { AIText = _currentResponse.Substring((_currentResponsePage - 1) * _chatBoxLength, _chatBoxLength); }
+                    
+            }
         }
 
 

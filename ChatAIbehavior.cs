@@ -17,12 +17,12 @@ namespace Bannerlord.ChatGPT
         internal readonly string MOD_VERSION = "1.0.0";
 
         // The data in this field will persist across saving
-        public string _APIkey = "546";
+        public string _APIkey;
 
         public override void SyncData(IDataStore dataStore)
         {
             // First argument is an identifier, only needs to be unique to this behavior
-            dataStore.SyncData("NPCchatAPIkey", ref _APIkey);
+            // dataStore.SyncData("NPCchatAPIkey", ref _APIkey);
         }
 
 

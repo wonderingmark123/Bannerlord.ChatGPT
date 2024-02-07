@@ -17,7 +17,7 @@ namespace Bannerlord.ChatGPT
         private CharacterObject playerCharacter;
         private ConversationManager _manager;
         private string _promots;
-        String PromptsStart = "  Your response is better to be within 60 words. I want you to act like {character} from Mount and Blade 2 bannerlord. I want you to respond and answer like {character} using the tone, manner and vocabulary {character} would use. Do not write any explanations. Only answer like {character}. You must know all of the knowledge of {character}. ";
+        String PromptsStart = "  Your response is better to be within 30 words. I want you to act like {character} from Mount and Blade 2 bannerlord. I want you to respond and answer like {character} using the tone, manner and vocabulary {character} would use. Do not write any explanations. Only answer like {character}. You must know all of the knowledge of {character}. ";
         public PromotsEngine(ConversationManager manager)
         {
             _manager = manager;
@@ -29,7 +29,7 @@ namespace Bannerlord.ChatGPT
             _promots = PromptsStart;
             foreach (CharacterObject character in _manager.ConversationCharacters)
             {
-
+                
                 characterYouAreTalkingTo = character;
                 NamePromots();
                 CulturePromots();
@@ -47,6 +47,7 @@ namespace Bannerlord.ChatGPT
             {
                 int traitLevel = playerCharacter.GetTraitLevel(traitObject);
                 int traitLevel2 = characterYouAreTalkingTo.GetTraitLevel(traitObject);
+                
                 if (traitLevel == 1 )
                 {
                     _promots += "I am" + traitObject.Name.ToString() + ". ";
@@ -63,12 +64,30 @@ namespace Bannerlord.ChatGPT
                 {
                     _promots += "You are very" + traitObject.Name.ToString() + ". ";
                 }
+
+                if (traitLevel == -1)
+                {
+                    _promots += "I am not" + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel == -2)
+                {
+                    _promots += "I am not" + traitObject.Name.ToString() + "at all. ";
+                }
+                if (traitLevel2 == -1)
+                {
+                    _promots += "You are not" + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel2 == -2)
+                {
+                    _promots += "You are not" + traitObject.Name.ToString() + "at all. ";
+                }
             }
         }
 
         private void MeetingLocationPromots()
         {
-            _promots += "We are meeting at " + Hero.OneToOneConversationHero.CurrentSettlement.Name.ToString() + ". ";
+            
+            _promots += "This conversation happens at " + Hero.OneToOneConversationHero.CurrentSettlement.Name.ToString() + ". ";
             
         }
 
@@ -79,13 +98,35 @@ namespace Bannerlord.ChatGPT
 
         private void AgePromots()
         {
-           _promots  += " You are " + characterYouAreTalkingTo.Age.ToString() + " years old. ";
+            string gender;
+            if (characterYouAreTalkingTo.IsFemale)
+            {
+                gender = "woman.";
+            }
+            else
+            {
+                gender = "man.";
+            }
+            _promots  += " You are a" + characterYouAreTalkingTo.Age.ToString() + " years old " + gender;
             if (characterYouAreTalkingTo.IsHero)
             {
+                if (playerCharacter.IsFemale)
+                {
+                    gender = "woman.";
+                }
+                else
+                {
+                    gender = "man.";
+                }
                 if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 50) 
                 {
-                    _promots += "I am " + playerCharacter.Age.ToString() + " years old. "; 
+                    
+                    _promots += "I am " + playerCharacter.Age.ToString() + " years old " + gender; 
                 } 
+                else
+                {
+                    _promots += "I am a " + gender;
+                }
             }
            
         }

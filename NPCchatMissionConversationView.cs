@@ -74,6 +74,18 @@ namespace Bannerlord.ChatGPT
 
             if (_conversationManager != null && _gauntletLayer != null && _gauntletLayer.Input != null && _dataSource.IsChating == true)
             {
+                if (Input.IsKeyPressed(InputKey.RightMouseButton) || this._gauntletLayer.Input.IsKeyDown(InputKey.RightMouseButton))
+                    {
+                        this._dataSource.PreviousPage();
+                        return;
+
+                    }
+                if (Input.IsKeyPressed(InputKey.LeftMouseButton) || this._gauntletLayer.Input.IsKeyDown(InputKey.LeftMouseButton))
+                {
+                    this._dataSource.NextPage();
+                    return;
+
+                }
                 if (Input.IsKeyPressed(InputKey.Tab) || this.IsGameKeyReleasedInAnyLayer("Leave", true) || this._gauntletLayer.Input.IsKeyDown(InputKey.Tab))
                 {
                     this._dataSource.ExitChating();

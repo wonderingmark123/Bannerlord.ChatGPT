@@ -49,7 +49,7 @@ namespace Bannerlord.ChatGPT
         public LoggingSystem()
         {
             string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string parentFolder = System.IO.Directory.GetParent((System.IO.Directory.GetParent(System.IO.Directory.GetParent(path).FullName)).FullName).FullName;
+            string parentFolder = Directory.GetParent(path: Directory.GetParent(path: Directory.GetParent(path).FullName).FullName).FullName;
             modRelayerFolder = System.IO.Path.Combine(parentFolder, "ModRelayer\\");
         }
         public void Addlog(string Str)
