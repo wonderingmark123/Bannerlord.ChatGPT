@@ -5,7 +5,6 @@ using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Conversation;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
-using TaleWorlds.CampaignSystem.LogEntries;
 using System.Threading.Tasks;
 using OpenAI_API;
 using OpenAI_API.Models;

@@ -1,12 +1,8 @@
 ﻿
 using System;
-using System.Threading.Tasks;
-using OpenAI_API;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
-using TaleWorlds.CampaignSystem.ViewModelCollection.Encyclopedia;
-using TaleWorlds.MountAndBlade;
 
 namespace Bannerlord.ChatGPT
 {
@@ -36,7 +32,7 @@ namespace Bannerlord.ChatGPT
                 AgePromots();
                 OccupationPromots();
                 MeetingLocationPromots();
-                TraitsPromots();
+                TraitsPromots();  
             }
             return _promots;
         }
