@@ -3,7 +3,6 @@ ChatGPT API is added to the game. You could talk to the villagers, companions, a
 
 This mod should be relatively clean without any interaction with other mods. Currently, it is tested in game version 1.2.8. In principle, this mod should also work for other. versions. If you have tried this mod with another version of the game and it works without any issues. I would really appreciate it if you could report that in the discussion.
 
-
 If you encounter any problem in this mod. Please check the log.txt in ${Gamefolder}/Modules/Bannerlord.ChatGPT/ModReplay/log.txt file. It should contain the problems you encounter by using this mod.
 Any bugs or issues reports are welcome. You could report here or on the GitHub page. Please include the log.txt file I mentioned previously. 
 
