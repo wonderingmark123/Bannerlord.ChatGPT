@@ -51,18 +51,21 @@ namespace Bannerlord.ChatGPT
             string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string parentFolder = Directory.GetParent(path: Directory.GetParent(path: Directory.GetParent(path).FullName).FullName).FullName;
             modRelayerFolder = System.IO.Path.Combine(parentFolder, "ModRelayer\\");
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(modRelayerFolder, "log.txt")))
+            {
+                DateTime currentTime = DateTime.Now;
+                Console.WriteLine("Time: " + currentTime);
+                outputFile.WriteLine("Chat GPT mod is loaded");
+            }
         }
         public void Addlog(string Str)
         {
 
 
             Str = Str + System.DateTime.Now.ToString();
-            // Set a variable to the Documents path.
-            string docPath =
-              Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
             // Write the string array to a new file named "WriteLines.txt".
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(modRelayerFolder, "log.txt")))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(modRelayerFolder, "log.txt"),true))
             {
                 DateTime currentTime = DateTime.Now;
                 Console.WriteLine("Time: " + currentTime);

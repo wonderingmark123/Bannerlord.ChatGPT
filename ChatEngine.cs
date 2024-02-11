@@ -3,11 +3,66 @@ using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
+using OpenAI_API;
+using OpenAI_API.Models;
+using System.Threading.Tasks;
+using Python.Runtime;
 
 namespace Bannerlord.ChatGPT
 {
+    public class ChatEngine
+    {
+        public OpenAIAPI bot;
+        public bool UsingAPI;
+        public OpenAI_API.Chat.Conversation _chat;
 
-    public class PromotsEngine
+        public ChatEngine(string APIkey)
+        {
+
+            try { bot = new OpenAIAPI(APIkey); }
+            catch { UsingAPI = false; }
+            using (Py.GIL())
+            {
+                dynamic gpt4all = Py.Import("gpt4all");
+            }
+        }
+
+        internal void AppendSystemMessage()
+        {
+            if (UsingAPI) 
+            {
+                PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager);
+                _chat.AppendSystemMessage(promotsEngine.GetPrompts());
+            }
+            else
+            {
+                
+            }
+
+
+        }
+
+        internal async Task<string> AppendUserInput(string userInputString)
+        {
+            if (UsingAPI)
+            {
+                _chat.AppendUserInput(userInputString);
+                string response = _chat.GetResponseFromChatbotAsync().ToString();
+                return response;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        internal void CreateConversation()
+        {
+            _chat = bot.Chat.CreateConversation();
+            _chat.Model = Model.ChatGPTTurbo;
+        }
+    };
+        public class PromotsEngine
     {
         private CharacterObject characterYouAreTalkingTo;
         private CharacterObject playerCharacter;

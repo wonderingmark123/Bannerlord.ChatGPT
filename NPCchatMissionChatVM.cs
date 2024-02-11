@@ -6,8 +6,7 @@ using TaleWorlds.CampaignSystem.ViewModelCollection.Conversation;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 using System.Threading.Tasks;
-using OpenAI_API;
-using OpenAI_API.Models;
+
 using TaleWorlds.Localization;
 
 namespace Bannerlord.ChatGPT
@@ -18,8 +17,8 @@ namespace Bannerlord.ChatGPT
         private string _newDialogText;
         private string _aIText;
         public string response;
-        public OpenAIAPI bot;
-        public OpenAI_API.Chat.Conversation _chat;
+        ChatEngine  _engine;
+        
         private bool _isChating;
         public bool _isBotStarted;
         public bool isResponding;
@@ -82,15 +81,14 @@ namespace Bannerlord.ChatGPT
 
                 try
                 {
-                    PromotsEngine promotsEngine = new PromotsEngine(_conversationManager);  
-                    bot = new OpenAIAPI(_APIkey); // shorthand
+                    
+                    _engine = new ChatEngine(_APIkey); // shorthand
 
+                    _engine.CreateConversation();
+                    _engine.AppendSystemMessage();
 
-                    _chat = bot.Chat.CreateConversation();
-                    _chat.Model = Model.ChatGPTTurbo;
-                    _chat.AppendSystemMessage(promotsEngine.GetPrompts());
-                    _chat.AppendUserInput(new TextObject("{=t4szG41Y1s}Hi! I want to talk with you. (ChatGPT)").ToString());
-                    AIText = await _chat.GetResponseFromChatbotAsync();
+                    
+                    AIText = await _engine.AppendUserInput(new TextObject("{=t4szG41Y1s}Hi! I want to talk with you. (ChatGPT)").ToString());
                 }
                 catch (Exception e)
                 {
@@ -126,12 +124,13 @@ namespace Bannerlord.ChatGPT
             
             try
             {
-                _chat.AppendUserInput(UserText);
+                
                 UserText = new TextObject("{=s9eLLK10jE}Waiting for response").ToString();
-                _currentResponse = await _chat.GetResponseFromChatbotAsync();
+                _currentResponse = await _engine.AppendUserInput(UserText); 
                 _currentResponse = _currentResponse.Replace("/n/n", "/n");
                 if (_currentResponse == null) { return; }
 
+                // reformating the response
                 _currentResponsePage = 1;
                 _totalPage = (int)(Math.Ceiling(((double)_currentResponse.Length / (double)_chatBoxLength)));
 

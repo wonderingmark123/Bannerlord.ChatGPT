@@ -1,14 +1,7 @@
-﻿using SandBox.CampaignBehaviors;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.MountAndBlade;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using static TaleWorlds.CampaignSystem.CharacterDevelopment.DefaultPerks;
 
 namespace Bannerlord.ChatGPT
 {

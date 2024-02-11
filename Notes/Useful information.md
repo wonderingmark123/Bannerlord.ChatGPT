@@ -4,31 +4,33 @@
 ## Doc
 
 * Inworld API: https://studio.inworld.ai/workspaces/default-ibnuyu5uug-lnmebb0pd9w/characters
-* Inworld Mod installization guide: https://bloctheworker.github.io/Inworld-Bannerlord-Mod/installation/
+* Inworld Mod installation guide: https://bloctheworker.github.io/Inworld-Bannerlord-Mod/installation/
 * Bannerlord wiki: https://mountandblade2bannerlord.wiki.fextralife.com
 * Bannerlord API doc: https://apidoc.bannerlord.com/v/1.2.7/
 * **Harmony** introduction: https://harmony.pardeike.net/articles/patching.html
-* official docs (piece of shit): https://moddocs.bannerlord.com/
-* **Chatgpt API**: https://platform.openai.com/playground/p/default-sql-translate?mode=chat
-* **Chatgpt C# lib**: https://github.com/OkGoDoIt/OpenAI-API-dotnet
-
+* official docs: https://moddocs.bannerlord.com/
+* **ChatGPT API**: https://platform.openai.com/playground/p/default-sql-translate?mode=chat
+* **ChatGPT C# lib**: https://github.com/OkGoDoIt/OpenAI-API-dotnet
+* CharacterAI-NET-API-Wrapper: https://github.com/drizzle-mizzle/CharacterAI-NET-API-Wrapper/wiki/Getting-started.
+* ChatGPT4All: https://docs.gpt4all.io/
+* ChatGPT4All C#: https://github.com/mvenditto/gpt4all/tree/980cbd552278c938fecaee482eed41fa9338b742/gpt4all-bindings/csharp
 ## tutorial
 * 骑马与砍杀2MOD制作精华索引贴: https://bbs.mountblade.com.cn/thread-2061939-1-1.html
 * C# tutorial on bilibili : https://www.bilibili.com/video/BV1UK4y1v713/?vd_source=813e8158652bb9c4b0fca669180455
 * C# tutorial by **Microsoft**: https://learn.microsoft.com/en-gb/training/modules/csharp-call-methods/4-return-values-input-parameters
 
-* Modding tutorial on youtube from Lesser Scholar: https://www.youtube.com/watch?v=_MGKjydqXPM&list=PLzebdAxJeltRwfJ8jzsNolgHkRvLjoCRC&index=7
+* Modding tutorial on Youtube from Lesser Scholar: https://www.youtube.com/watch?v=_MGKjydqXPM&list=PLzebdAxJeltRwfJ8jzsNolgHkRvLjoCRC&index=7
 * Modding documents: https://docs.bannerlordmodding.com/_intro/getting-started.html#creating-a-module
 * How to debug: [PDF version](./Here%20is%20a%20small%20tutorial%20to%20debug%20MB2Bannerlord.pdf)
-* .NET reflection tutoriol: https://dotnetcademy.net/Learn/4/Pages/2
+* .NET reflection tutorial: https://dotnetcademy.net/Learn/4/Pages/2
 
-* Chatgpt API in China: https://github.com/Sha1rholder/use-ChatGPT-in-GFW?tab=readme-ov-file#%E5%88%9D%E9%98%B6chatgpt
+* ChatGPT API in China: https://github.com/Sha1rholder/use-ChatGPT-in-GFW?tab=readme-ov-file#%E5%88%9D%E9%98%B6chatgpt
 ## Local
-modules location: E:\Games\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules
+Modules location: E:\Games\Steam\steamapps\common\Mount & Blade II Bannerlord\Modules
 
 press Windows key+Alt+R to record video
 
-## Prompts notes
+## Prompt notes
 For character
 
 * I want you to act like {character} from {series}. I want you to respond and answer like {character} using the tone, manner and vocabulary {character} would use. Do not write any explanations. Only answer like {character}. You must know all of the knowledge of {character}. My first sentence is "Hi {character}."*

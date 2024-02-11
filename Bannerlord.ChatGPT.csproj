@@ -64,6 +64,8 @@
     <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Bannerlord.BuildResources" Version="1.1.0.104" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="OpenAI" Version="1.10.0" />
+    <PackageReference Include="python" Version="3.12.2" />
+    <PackageReference Include="pythonnet" Version="3.1.0-preview2024-02-05" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 	
