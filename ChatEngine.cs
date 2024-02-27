@@ -6,37 +6,90 @@ using TaleWorlds.CampaignSystem.Conversation;
 using OpenAI_API;
 using OpenAI_API.Models;
 using System.Threading.Tasks;
-using Python.Runtime;
+using LLama;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Text;
+using System.Net.Http;
 
 namespace Bannerlord.ChatGPT
 {
+
     public class ChatEngine
     {
         public OpenAIAPI bot;
         public bool UsingAPI;
         public OpenAI_API.Chat.Conversation _chat;
-
+        public string conversationID;
+        private System.Diagnostics.Process process;
+        private string modelPath;
+        private LoggingSystem log;
+        public ChatSession session;
+        private ClientWebSocket ws;
+        private static readonly HttpClient client = new HttpClient();
         public ChatEngine(string APIkey)
         {
-
-            try { bot = new OpenAIAPI(APIkey); }
-            catch { UsingAPI = false; }
-            using (Py.GIL())
+            log = new LoggingSystem();
+            if (APIkey != null && APIkey.Length == 51) 
             {
-                dynamic gpt4all = Py.Import("gpt4all");
+                
+                bot = new OpenAIAPI(APIkey);
+                
             }
+            else 
+            { 
+                UsingAPI = false;
+                ws = new ClientWebSocket();
+                
+            }
+
         }
 
-        internal void AppendSystemMessage()
+
+        public void CloseProcess()
         {
+            if (!UsingAPI && ws != null)
+            {
+                
+                ws.Abort();
+                
+            }
+            
+            
+        }
+        internal async Task AppendSystemMessage()
+        {
+            
             if (UsingAPI) 
             {
                 PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager);
-                _chat.AppendSystemMessage(promotsEngine.GetPrompts());
+                string SystemMessage = promotsEngine.GetPrompts();
+                _chat.AppendSystemMessage(SystemMessage);
             }
             else
             {
-                
+                string SystemMessage = "SystemMessage";
+                var bytes = Encoding.UTF8.GetBytes(SystemMessage);
+                var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
+                await ws.SendAsync(arraySegment,
+                                WebSocketMessageType.Text,
+                                true,
+                                CancellationToken.None);
+
+
+                PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager);
+
+                SystemMessage = promotsEngine.GetPrompts();
+                bytes = Encoding.UTF8.GetBytes(SystemMessage);
+                arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
+                await ws.SendAsync(arraySegment,
+                                WebSocketMessageType.Text,
+                                true,
+                                CancellationToken.None);
+
+                var buffer = new byte[1024];
+                var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
             }
 
 
@@ -44,6 +97,7 @@ namespace Bannerlord.ChatGPT
 
         internal async Task<string> AppendUserInput(string userInputString)
         {
+            string message;
             if (UsingAPI)
             {
                 _chat.AppendUserInput(userInputString);
@@ -52,23 +106,55 @@ namespace Bannerlord.ChatGPT
             }
             else
             {
-                return null;
+                var bytes = Encoding.UTF8.GetBytes(userInputString);
+                var arraySegment = new ArraySegment<byte>(bytes, 0, bytes.Length);
+                await ws.SendAsync(arraySegment,
+                                WebSocketMessageType.Text,
+                                true,
+                                CancellationToken.None);
+
+                    var buffer = new byte[1024];
+                    var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    if (result.MessageType == WebSocketMessageType.Close)
+                    {
+                        return "";
+                    }
+
+                    message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    
+                return message;
             }
         }
 
-        internal void CreateConversation()
+
+        internal async Task CreateConversation()
         {
-            _chat = bot.Chat.CreateConversation();
-            _chat.Model = Model.ChatGPTTurbo;
+            if (UsingAPI)
+            {
+
+                _chat = bot.Chat.CreateConversation();
+                _chat.Model = Model.ChatGPTTurbo;
+                await AppendSystemMessage();
+
+            }
+            else
+            {
+                Uri uri = new("ws://localhost:4894/ws");
+                await ws.ConnectAsync(uri, default);
+                await AppendSystemMessage();
+
+            }
+
         }
+
     };
-        public class PromotsEngine
+    public class PromotsEngine
     {
         private CharacterObject characterYouAreTalkingTo;
         private CharacterObject playerCharacter;
         private ConversationManager _manager;
         private string _promots;
-        String PromptsStart = "  Your response is better to be within 30 words. I want you to act like {character} from Mount and Blade 2 bannerlord. I want you to respond and answer like {character} using the tone, manner and vocabulary {character} would use. Do not write any explanations. Only answer like {character}. You must know all of the knowledge of {character}. ";
+        public string PromptsStart = "I want you to act like {character} from Mount and Blade 2 bannerlord. I want you to respond and answer like {character} using the tone, manner and vocabulary {character} would use. Do not write any explanations. Only answer like {character}. You must know all of the knowledge of {character}. ";
         public PromotsEngine(ConversationManager manager)
         {
             _manager = manager;
@@ -82,17 +168,18 @@ namespace Bannerlord.ChatGPT
             {
                 
                 characterYouAreTalkingTo = character;
-                NamePromots();
-                CulturePromots();
-                AgePromots();
-                OccupationPromots();
-                MeetingLocationPromots();
-                TraitsPromots();  
+                
+                CulturePrompts();
+                AgePrompts();
+                OccupationPrompts();
+                MeetingLocationPrompts();
+                TraitsPrompts();
+                NamePrompts();
             }
             return _promots;
         }
 
-        private void TraitsPromots()
+        private void TraitsPrompts()
         {
             foreach (TraitObject traitObject in DefaultTraits.Personality)
             {
@@ -101,11 +188,11 @@ namespace Bannerlord.ChatGPT
                 
                 if (traitLevel == 1 )
                 {
-                    _promots += "I am" + traitObject.Name.ToString() + ". ";
+                    _promots += "I am " + traitObject.Name.ToString() + ". ";
                 }
                 if (traitLevel == 2)
                 {
-                    _promots += "I am very" + traitObject.Name.ToString() + ". ";
+                    _promots += "I am very " + traitObject.Name.ToString() + ". ";
                 }
                 if (traitLevel2 == 1)
                 {
@@ -113,41 +200,41 @@ namespace Bannerlord.ChatGPT
                 }
                 if (traitLevel2 == 2)
                 {
-                    _promots += "You are very" + traitObject.Name.ToString() + ". ";
+                    _promots += "You are very " + traitObject.Name.ToString() + ". ";
                 }
 
                 if (traitLevel == -1)
                 {
-                    _promots += "I am not" + traitObject.Name.ToString() + ". ";
+                    _promots += "I am not " + traitObject.Name.ToString() + ". ";
                 }
                 if (traitLevel == -2)
                 {
-                    _promots += "I am not" + traitObject.Name.ToString() + "at all. ";
+                    _promots += "I am not " + traitObject.Name.ToString() + " at all. ";
                 }
                 if (traitLevel2 == -1)
                 {
-                    _promots += "You are not" + traitObject.Name.ToString() + ". ";
+                    _promots += "You are not " + traitObject.Name.ToString() + ". ";
                 }
                 if (traitLevel2 == -2)
                 {
-                    _promots += "You are not" + traitObject.Name.ToString() + "at all. ";
+                    _promots += "You are not " + traitObject.Name.ToString() + " at all. ";
                 }
             }
         }
 
-        private void MeetingLocationPromots()
+        private void MeetingLocationPrompts()
         {
             
             _promots += "This conversation happens at " + Hero.OneToOneConversationHero.CurrentSettlement.Name.ToString() + ". ";
             
         }
 
-        private void NamePromots()
+        private void NamePrompts()
         {
             _promots = _promots.Replace("{character}", characterYouAreTalkingTo.Name.ToString());
         }
 
-        private void AgePromots()
+        private void AgePrompts()
         {
             string gender;
             if (characterYouAreTalkingTo.IsFemale)
@@ -172,29 +259,29 @@ namespace Bannerlord.ChatGPT
                 if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 50) 
                 {
                     
-                    _promots += "I am " + playerCharacter.Age.ToString() + " years old " + gender; 
+                    _promots += "User is " + playerCharacter.Age.ToString() + " years old " + gender; 
                 } 
                 else
                 {
-                    _promots += "I am a " + gender;
+                    _promots += "User is a " + gender;
                 }
             }
            
         }
-        private void CulturePromots()
+        private void CulturePrompts()
         {
             _promots += " You are from" + characterYouAreTalkingTo.Culture.ToString() + ".";
             if (characterYouAreTalkingTo.IsHero)
             {
                 if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 5)
                 {
-                    _promots += "I am from" + playerCharacter.Culture.ToString() + ".";
+                    _promots += "User is from" + playerCharacter.Culture.ToString() + ".";
                 }
             }
 
         }
 
-        private void OccupationPromots()
+        private void OccupationPrompts()
         {
             _promots += "Your occupation is " + characterYouAreTalkingTo.Occupation.ToString() + ". ";
             if (characterYouAreTalkingTo.IsHero)
@@ -205,6 +292,155 @@ namespace Bannerlord.ChatGPT
                 }
             }
             
+        }
+    }
+    public class PromptsEngineOrca
+    {
+        private CharacterObject characterYouAreTalkingTo;
+        private CharacterObject playerCharacter;
+        private ConversationManager _manager;
+        private string _promots;
+        public string PromptsStart = "Transcript of a dialog, where the User interacts with an {occupation} named {character}. ";
+        public PromptsEngineOrca(ConversationManager manager)
+        {
+            _manager = manager;
+            playerCharacter = CharacterObject.PlayerCharacter;
+        }
+
+        public string GetPrompts()
+        {
+            _promots = PromptsStart;
+            foreach (CharacterObject character in _manager.ConversationCharacters)
+            {
+
+                characterYouAreTalkingTo = character;
+                
+                CulturePrompts();
+                AgePrompts();
+                OccupationPrompts();
+                MeetingLocationPrompts();
+                TraitsPrompts();
+                NamePrompts();
+            }
+            return _promots;
+        }
+
+        private void TraitsPrompts()
+        {
+            foreach (TraitObject traitObject in DefaultTraits.Personality)
+            {
+                int traitLevel = playerCharacter.GetTraitLevel(traitObject);
+                int traitLevel2 = characterYouAreTalkingTo.GetTraitLevel(traitObject);
+
+                if (traitLevel == 1)
+                {
+                    _promots += "User is " + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel == 2)
+                {
+                    _promots += "User is very " + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel2 == 1)
+                {
+                    _promots += "{character} is " + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel2 == 2)
+                {
+                    _promots += "{character} is very " + traitObject.Name.ToString() + ". ";
+                }
+
+                if (traitLevel == -1)
+                {
+                    _promots += "User is not " + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel == -2)
+                {
+                    _promots += "User is not " + traitObject.Name.ToString() + " at all. ";
+                }
+                if (traitLevel2 == -1)
+                {
+                    _promots += "{character} is not " + traitObject.Name.ToString() + ". ";
+                }
+                if (traitLevel2 == -2)
+                {
+                    _promots += "{character} is not " + traitObject.Name.ToString() + " at all. ";
+                }
+            }
+        }
+
+        private void MeetingLocationPrompts()
+        {
+
+            _promots += "This conversation happens at " + Hero.OneToOneConversationHero.CurrentSettlement.Name.ToString() + ". ";
+
+        }
+
+        private void NamePrompts()
+        {
+            _promots = _promots.Replace("{character}", characterYouAreTalkingTo.Name.ToString());
+        }
+
+        private void AgePrompts()
+        {
+            string gender;
+            if (characterYouAreTalkingTo.IsFemale)
+            {
+                gender =  "woman.";
+            }
+            else
+            {
+                gender = "man.";
+            }
+            _promots += " {character} is a" + characterYouAreTalkingTo.Age.ToString() + " years old " + gender;
+            if (characterYouAreTalkingTo.IsHero)
+            {
+                if (playerCharacter.IsFemale)
+                {
+                    gender = "woman.";
+                }
+                else
+                {
+                    gender = "man.";
+                }
+                if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 50)
+                {
+
+                    _promots += "User is " + playerCharacter.Age.ToString() + " years old " + gender;
+                }
+                else
+                {
+                    _promots += "User is a " + gender;
+                }
+            }
+
+        }
+        private void CulturePrompts()
+        {
+            _promots += " {character} is from" + characterYouAreTalkingTo.Culture.ToString() + ".";
+            if (characterYouAreTalkingTo.IsHero)
+            {
+                if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 5)
+                {
+                    _promots += "User is from" + playerCharacter.Culture.ToString() + ".";
+                }
+            }
+
+        }
+
+        private void OccupationPrompts()
+        {
+            
+            // _promots += "Your occupation is " + characterYouAreTalkingTo.Occupation.ToString() + ". ";
+
+            _promots = _promots.Replace("{occupation}", characterYouAreTalkingTo.Occupation.ToString());
+            if (characterYouAreTalkingTo.IsHero)
+            {
+                if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 5)
+                {
+                    _promots += "User's occupation is " + playerCharacter.Occupation.ToString() + ". ";
+                }
+            }
+
         }
     }
 }

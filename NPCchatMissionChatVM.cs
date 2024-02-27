@@ -63,13 +63,9 @@ namespace Bannerlord.ChatGPT
                     _logSys.Addlog("API key is not properly read! Exception: " + e.Message);
                     InformationManager.DisplayMessage(new InformationMessage(
                                new TextObject("{=xO4QZbQ7XE}API key is not properly read! Please Check your /Modules/Bannerlord_ChatGPT/APIkey.txt").ToString()));
-                    _isBotStarted = false;
-                    return;
+                    
                 }
-                // remove all the space
-                _APIkey = _APIkey.Replace(" ", "");
-                _APIkey = _APIkey.Replace("\"", "");
-                _APIkey = _APIkey.Replace("\n", "");
+                
 
 
             }
@@ -81,14 +77,13 @@ namespace Bannerlord.ChatGPT
 
                 try
                 {
-                    
+                    UserText = new TextObject("{=s9eLLK10jE}Waiting for response").ToString();
                     _engine = new ChatEngine(_APIkey); // shorthand
 
-                    _engine.CreateConversation();
-                    _engine.AppendSystemMessage();
-
+                    await _engine.CreateConversation();
                     
                     AIText = await _engine.AppendUserInput(new TextObject("{=t4szG41Y1s}Hi! I want to talk with you. (ChatGPT)").ToString());
+                    UserText = new TextObject("").ToString();
                 }
                 catch (Exception e)
                 {
@@ -105,9 +100,10 @@ namespace Bannerlord.ChatGPT
 
         public void ExitChating()
         {
-            if (this._conversationManager != null)
+            if (_engine != null)
             {
-                _conversationManager.EndConversation();
+                _engine.CloseProcess();
+                
 
             }
         }
@@ -124,9 +120,10 @@ namespace Bannerlord.ChatGPT
             
             try
             {
-                
+                string userInput = UserText;
                 UserText = new TextObject("{=s9eLLK10jE}Waiting for response").ToString();
-                _currentResponse = await _engine.AppendUserInput(UserText); 
+                _currentResponse = await _engine.AppendUserInput(userInput);
+                
                 _currentResponse = _currentResponse.Replace("/n/n", "/n");
                 if (_currentResponse == null) { return; }
 
@@ -160,7 +157,6 @@ namespace Bannerlord.ChatGPT
             // SendJsonAsync(message);
         }
 
-
         public override void OnFinalize()
         {
             base.OnFinalize();
@@ -168,11 +164,6 @@ namespace Bannerlord.ChatGPT
             
         }
 
-        internal void ExecuteContinue()
-        {
-            Debug.Print("ExecuteContinue", 0, Debug.DebugColor.White, 17592186044416UL);
-            this._conversationManager.ContinueConversation();
-        }
 
         internal void PreviousPage()
         {

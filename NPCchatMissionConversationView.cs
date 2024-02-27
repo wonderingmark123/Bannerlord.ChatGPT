@@ -42,6 +42,7 @@ namespace Bannerlord.ChatGPT
         }
         public override void OnConversationEnd()
         {
+            _dataSource.ExitChating();
             MissionScreen.RemoveLayer(_gauntletLayer);
             _dataSource.IsChating = false;
             _gauntletLayer = null;
@@ -86,13 +87,7 @@ namespace Bannerlord.ChatGPT
                     return;
 
                 }
-                if (Input.IsKeyPressed(InputKey.Tab) || this.IsGameKeyReleasedInAnyLayer("Leave", true) || this._gauntletLayer.Input.IsKeyDown(InputKey.Tab))
-                {
-                    this._dataSource.ExitChating();
-                    return;
-                    
-                }
-                else if (Input.IsKeyDown(InputKey.Enter) || this.IsGameKeyReleasedInAnyLayer("Confirm", true) || _gauntletLayer.Input.IsKeyDown(InputKey.Enter))
+                if (Input.IsKeyDown(InputKey.Enter) || this.IsGameKeyReleasedInAnyLayer("Confirm", true) || _gauntletLayer.Input.IsKeyDown(InputKey.Enter))
                 {
                     if (_dataSource.GetType() == typeof(NPCchatMissionChatVM) && !_dataSource.isResponding)
                     {

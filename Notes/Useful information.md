@@ -14,6 +14,8 @@
 * CharacterAI-NET-API-Wrapper: https://github.com/drizzle-mizzle/CharacterAI-NET-API-Wrapper/wiki/Getting-started.
 * ChatGPT4All: https://docs.gpt4all.io/
 * ChatGPT4All C#: https://github.com/mvenditto/gpt4all/tree/980cbd552278c938fecaee482eed41fa9338b742/gpt4all-bindings/csharp
+* Mantella: https://github.com/art-from-the-machine/Mantella
+* text-generation-webui: https://github.com/oobabooga/text-generation-webui 
 ## tutorial
 * 骑马与砍杀2MOD制作精华索引贴: https://bbs.mountblade.com.cn/thread-2061939-1-1.html
 * C# tutorial on bilibili : https://www.bilibili.com/video/BV1UK4y1v713/?vd_source=813e8158652bb9c4b0fca669180455
