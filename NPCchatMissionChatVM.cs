@@ -60,7 +60,7 @@ namespace Bannerlord.ChatGPT
                 catch (Exception e)
                 {
 
-                    _logSys.Addlog("API key is not properly read! Exception: " + e.Message);
+                    _logSys.Addlog("API key is not properly read! Exception: " + e.ToString());
                     InformationManager.DisplayMessage(new InformationMessage(
                                new TextObject("{=xO4QZbQ7XE}API key is not properly read! Please Check your /Modules/Bannerlord_ChatGPT/APIkey.txt").ToString()));
                     
@@ -80,15 +80,16 @@ namespace Bannerlord.ChatGPT
                     UserText = new TextObject("{=s9eLLK10jE}Waiting for response").ToString();
                     _engine = new ChatEngine(_APIkey); // shorthand
 
-                    await _engine.CreateConversation();
-                    
-                    AIText = await _engine.AppendUserInput(new TextObject("{=t4szG41Y1s}Hi! I want to talk with you. (ChatGPT)").ToString());
+                    AIText = await _engine.CreateConversation();
+                    ReformResponse();
+
+
                     UserText = new TextObject("").ToString();
                 }
                 catch (Exception e)
                 {
                     _isBotStarted = false;
-                    _logSys.Addlog("ChatGPT didn't pass the test! Exception: " + e.Message);
+                    _logSys.Addlog("ChatGPT didn't pass the test! Exception: " + e.ToString());
                     InformationManager.DisplayMessage(new InformationMessage(
                                new TextObject("{=c40K7kO5Yr}ChatGPT didn't start successfully!").ToString()));
                     return ;
@@ -124,37 +125,45 @@ namespace Bannerlord.ChatGPT
                 UserText = new TextObject("{=s9eLLK10jE}Waiting for response").ToString();
                 _currentResponse = await _engine.AppendUserInput(userInput);
                 
-                _currentResponse = _currentResponse.Replace("/n/n", "/n");
-                if (_currentResponse == null) { return; }
 
-                // reformating the response
-                _currentResponsePage = 1;
-                _totalPage = (int)(Math.Ceiling(((double)_currentResponse.Length / (double)_chatBoxLength)));
-
-                if (_currentResponse.Length > _chatBoxLength && _currentResponse != null)
-                {
-                    // FontsizeAIresponse = (int)((double)(27 * 250 / AIText.Length));
-
-                    AIText = _currentResponse.Substring((_currentResponsePage - 1) * _chatBoxLength, _chatBoxLength * _currentResponsePage);
-                    InformationManager.DisplayMessage(new InformationMessage(
-                               new TextObject("{=0YlmsVWdKl}Left click to move to next page. Right click to move to previous page").ToString()));
-                }
-                else
-                {
-                    AIText = _currentResponse;
-
-                }
+                ReformResponse();
+                
 
 
             }
             catch (Exception e)
             {
 
-                _logSys.Addlog("Conversation failed! Exception: " + e.Message);
+                _logSys.Addlog("Conversation failed! Exception: " + e.ToString());
             }
             isResponding = false;
             UserText = "";
             // SendJsonAsync(message);
+        }
+
+        private void ReformResponse()
+        {
+
+            if (_currentResponse == null) { return; }
+
+            _currentResponse = _currentResponse.Replace("/n/n", "/n");
+            // reformating the response
+            _currentResponsePage = 1;
+            _totalPage = (int)(Math.Ceiling(((double)_currentResponse.Length / (double)_chatBoxLength)));
+
+            if (_currentResponse.Length > _chatBoxLength && _currentResponse != null)
+            {
+                // FontsizeAIresponse = (int)((double)(27 * 250 / AIText.Length));
+
+                AIText = _currentResponse.Substring((_currentResponsePage - 1) * _chatBoxLength, _chatBoxLength * _currentResponsePage);
+                InformationManager.DisplayMessage(new InformationMessage(
+                           new TextObject("{=0YlmsVWdKl}Left click to move to next page. Right click to move to previous page").ToString()));
+            }
+            else
+            {
+                AIText = _currentResponse;
+
+            }
         }
 
         public override void OnFinalize()

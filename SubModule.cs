@@ -53,7 +53,7 @@ namespace Bannerlord.ChatGPT
                 catch (Exception e)
                 {
 
-                    log.Addlog("model path is not properly read! Exception: " + e.Message);
+                    log.Addlog("model path is not properly read! Exception: " + e.ToString());
                     InformationManager.DisplayMessage(new InformationMessage(
                                new TextObject("{=xO4QZbQ7XE}API key is not properly read! Please Check your /Modules/Bannerlord_ChatGPT/APIkey.txt").ToString()));
 
@@ -64,7 +64,7 @@ namespace Bannerlord.ChatGPT
 
             try
             {
-                if (modelPath.Substring(0, 3) == "sk-" && modelPath.Length == 51)
+                if (modelPath != null && modelPath.Substring(0, 3) == "sk-" && modelPath.Length == 51)
                 {
                     return;
                 }
@@ -79,11 +79,11 @@ namespace Bannerlord.ChatGPT
                 };
                 didIStarted = true;
                 _server = Process.Start(startInfo);
-                _server.PriorityClass = ProcessPriorityClass.RealTime;
+                _server.PriorityClass = ProcessPriorityClass.High;
             }
             catch(Exception ex) 
             {
-                log.Addlog("LLamaWebsocket.exe didn't start!" + ex.Message);
+                log.Addlog("LLamaWebsocket.exe didn't start!" + ex.ToString());
             }
         }
 

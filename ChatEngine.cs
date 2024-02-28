@@ -11,6 +11,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Text;
 using System.Net.Http;
+using TaleWorlds.Localization;
 
 namespace Bannerlord.ChatGPT
 {
@@ -62,7 +63,7 @@ namespace Bannerlord.ChatGPT
             
             if (UsingAPI) 
             {
-                PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager);
+                PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager,null);
                 string SystemMessage = promotsEngine.GetPrompts();
                 _chat.AppendSystemMessage(SystemMessage);
             }
@@ -77,7 +78,8 @@ namespace Bannerlord.ChatGPT
                                 CancellationToken.None);
 
 
-                PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager);
+                PromotsEngine promotsEngine = new PromotsEngine(Campaign.Current.ConversationManager,
+                    "You are \"{character}\". We are living on the fictional continent of Calradia.");
 
                 SystemMessage = promotsEngine.GetPrompts();
                 bytes = Encoding.UTF8.GetBytes(SystemMessage);
@@ -87,8 +89,6 @@ namespace Bannerlord.ChatGPT
                                 true,
                                 CancellationToken.None);
 
-                var buffer = new byte[1024];
-                var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
 
             }
 
@@ -127,7 +127,7 @@ namespace Bannerlord.ChatGPT
         }
 
 
-        internal async Task CreateConversation()
+        internal async Task<string> CreateConversation()
         {
             if (UsingAPI)
             {
@@ -135,14 +135,14 @@ namespace Bannerlord.ChatGPT
                 _chat = bot.Chat.CreateConversation();
                 _chat.Model = Model.ChatGPTTurbo;
                 await AppendSystemMessage();
-
+                return await AppendUserInput(new TextObject("{=t4szG41Y1s}Hi! I want to talk with you. (ChatGPT)").ToString());
             }
             else
             {
                 Uri uri = new("ws://localhost:4894/ws");
                 await ws.ConnectAsync(uri, default);
                 await AppendSystemMessage();
-
+                return await AppendUserInput(new TextObject("{=t4szG41Y1s}Hi! I want to talk with you. (ChatGPT)").ToString());
             }
 
         }
@@ -155,8 +155,12 @@ namespace Bannerlord.ChatGPT
         private ConversationManager _manager;
         private string _promots;
         public string PromptsStart = "I want you to act like {character} from Mount and Blade 2 bannerlord. I want you to respond and answer like {character} using the tone, manner and vocabulary {character} would use. Do not write any explanations. Only answer like {character}. You must know all of the knowledge of {character}. ";
-        public PromotsEngine(ConversationManager manager)
+        public PromotsEngine(ConversationManager manager,string startPrompt)
         {
+            if (!string.IsNullOrEmpty(startPrompt))
+            {
+                PromptsStart = startPrompt;
+            }
             _manager = manager;
             playerCharacter = CharacterObject.PlayerCharacter;
         }
@@ -188,36 +192,36 @@ namespace Bannerlord.ChatGPT
                 
                 if (traitLevel == 1 )
                 {
-                    _promots += "I am " + traitObject.Name.ToString() + ". ";
+                    _promots += "I am " + traitObject.Name.ToString().ToLower() + ". ";
                 }
                 if (traitLevel == 2)
                 {
-                    _promots += "I am very " + traitObject.Name.ToString() + ". ";
+                    _promots += "I am very " + traitObject.Name.ToString().ToLower() + ". ";
                 }
                 if (traitLevel2 == 1)
                 {
-                    _promots += "You are " + traitObject.Name.ToString() + ". ";
+                    _promots += "You are " + traitObject.Name.ToString().ToLower() + ". ";
                 }
                 if (traitLevel2 == 2)
                 {
-                    _promots += "You are very " + traitObject.Name.ToString() + ". ";
+                    _promots += "You are very " + traitObject.Name.ToString().ToLower() + ". ";
                 }
 
                 if (traitLevel == -1)
                 {
-                    _promots += "I am not " + traitObject.Name.ToString() + ". ";
+                    _promots += "I am not " + traitObject.Name.ToString().ToLower() + ". ";
                 }
                 if (traitLevel == -2)
                 {
-                    _promots += "I am not " + traitObject.Name.ToString() + " at all. ";
+                    _promots += "I am not " + traitObject.Name.ToString().ToLower() + " at all. ";
                 }
                 if (traitLevel2 == -1)
                 {
-                    _promots += "You are not " + traitObject.Name.ToString() + ". ";
+                    _promots += "You are not " + traitObject.Name.ToString().ToLower() + ". ";
                 }
                 if (traitLevel2 == -2)
                 {
-                    _promots += "You are not " + traitObject.Name.ToString() + " at all. ";
+                    _promots += "You are not " + traitObject.Name.ToString().ToLower() + " at all. ";
                 }
             }
         }
@@ -232,6 +236,7 @@ namespace Bannerlord.ChatGPT
         private void NamePrompts()
         {
             _promots = _promots.Replace("{character}", characterYouAreTalkingTo.Name.ToString());
+            _promots += " My name is " + playerCharacter.Name.ToString() +". ";
         }
 
         private void AgePrompts()
@@ -239,31 +244,31 @@ namespace Bannerlord.ChatGPT
             string gender;
             if (characterYouAreTalkingTo.IsFemale)
             {
-                gender = "woman.";
+                gender = "woman. ";
             }
             else
             {
-                gender = "man.";
+                gender = "man. ";
             }
-            _promots  += " You are a" + characterYouAreTalkingTo.Age.ToString() + " years old " + gender;
+            _promots  += " You are a " +  ((int)characterYouAreTalkingTo.Age).ToString() + " years old " + gender;
             if (characterYouAreTalkingTo.IsHero)
             {
                 if (playerCharacter.IsFemale)
                 {
-                    gender = "woman.";
+                    gender = "woman. ";
                 }
                 else
                 {
-                    gender = "man.";
+                    gender = "man. ";
                 }
                 if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 50) 
                 {
                     
-                    _promots += "User is " + playerCharacter.Age.ToString() + " years old " + gender; 
+                    _promots += "I am " + playerCharacter.Age.ToString() + " years old " + gender; 
                 } 
                 else
                 {
-                    _promots += "User is a " + gender;
+                    _promots += "I am a " + gender;
                 }
             }
            
@@ -275,7 +280,7 @@ namespace Bannerlord.ChatGPT
             {
                 if (characterYouAreTalkingTo.HeroObject.HasMet && characterYouAreTalkingTo.HeroObject.GetRelationWithPlayer() > 5)
                 {
-                    _promots += "User is from" + playerCharacter.Culture.ToString() + ".";
+                    _promots += "I am from " + playerCharacter.Culture.ToString() + ".";
                 }
             }
 
